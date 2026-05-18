@@ -1,44 +1,49 @@
-import { Component, OnInit, ChangeDetectionStrategy, input, output, inject, WritableSignal, Signal, signal, computed, Inject, Injector } from '@angular/core';
-import { WeeklyGoalsItemAnimations } from './weekly-goals-item.animations';
-import { User } from 'src/app/core/store/user/user.model';
-import { AuthStore } from 'src/app/core/store/auth/auth.store';
-import { BatchWriteService, BATCH_WRITE_SERVICE } from 'src/app/core/store/batch-write.service';
+import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatIconModule } from '@angular/material/icon';
+import { WeeklyGoal } from 'src/app/core/store/weekly-goal/weekly-goal.model';
+import { WeeklyGoalStore } from 'src/app/core/store/weekly-goal/weekly-goal.store';
+import { WeeklyGoalData } from '../../home.model';
+import { WeeklyGoalItemAnimations } from './weekly-goal-item.animations';
+import { NgStyle } from '@angular/common';
 
 @Component({
-  selector: 'app-weekly-goals-item',
-  templateUrl: './weekly-goals-item.component.html',
-  styleUrls: ['./weekly-goals-item.component.scss'],
+  selector: 'app-weekly-goal-item',
+  templateUrl: './weekly-goal-item.component.html',
+  styleUrls: ['./weekly-goal-item.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: WeeklyGoalsItemAnimations,
-  standalone: true,
+  animations: [WeeklyGoalItemAnimations],
   imports: [
+    MatButtonModule,
+    MatCheckboxModule,
+    MatIconModule,
+    NgStyle,
   ],
 })
-export class WeeklyGoalsItemComponent implements OnInit {
-  readonly authStore = inject(AuthStore);
+export class WeeklyGoalItemComponent {
+  readonly weeklyGoalStore = inject(WeeklyGoalStore);
   // --------------- INPUTS AND OUTPUTS ------------------
 
-  /** The current signed in user. */
-  currentUser: Signal<User> = this.authStore.user;
+  /** Weekly goal data associated with the goal that was passed in. */
+  goal = input.required<WeeklyGoalData>();
 
-  // --------------- LOCAL UI STATE ----------------------
+  /** Emits the updated weekly goal when the state of the goal changes (checked or unchecked) */
+  checked = output<WeeklyGoal>();
 
-  /** Loading icon. */
-  loading: WritableSignal<boolean> = signal(false);
+  /** Handles clicking of weekly goal */
+  weeklyGoalClicked = output<void>();
 
-  // --------------- COMPUTED DATA -----------------------
+  // --------------- LOCAL AND GLOBAL STATE --------------
 
-  // --------------- EVENT HANDLING ----------------------
+  // --------------- DATA BINDING ------------------------
 
-  // --------------- OTHER -------------------------------
+  // --------------- EVENT BINDING -----------------------
 
-  constructor(
-    private injector: Injector,
-    @Inject(BATCH_WRITE_SERVICE) private batch: BatchWriteService,
-  ) { }
-
-  // --------------- LOAD AND CLEANUP --------------------
-  
-  ngOnInit(): void {
+  /** Update weekly goal. */
+  checkGoal(goal: WeeklyGoal) {
+    this.checked.emit(goal);
   }
+
+  // --------------- HELPER FUNCTIONS AND OTHER ----------
 }
